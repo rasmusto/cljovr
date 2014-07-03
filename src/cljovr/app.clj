@@ -1,5 +1,5 @@
-(ns clojocular.app
-  (:require [clojocular.utils :as utils])
+(ns cljovr.app
+  (:require [cljovr.utils :as utils])
   (:import [java.awt Rectangle]
            [org.lwjgl.opengl ContextAttribs PixelFormat]
            [org.saintandreas.gl FrameBuffer MatrixStack]

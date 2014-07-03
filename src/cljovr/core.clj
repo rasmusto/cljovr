@@ -1,4 +1,4 @@
-(ns clojocular.core
+(ns cljovr.core
   (:import com.oculusvr.capi.DistortionMesh
            com.oculusvr.capi.SensorState
            com.oculusvr.capi.OvrLibrary

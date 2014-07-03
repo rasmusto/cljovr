@@ -1,6 +1,6 @@
-(ns clojocular.utils-test
+(ns cljovr.utils-test
   (:require [clojure.test :refer :all]
-            [clojocular.utils :refer :all])
+            [cljovr.utils :refer :all])
   (:import [org.saintandreas.math Matrix4f Quaternion Vector3f]
            [com.oculusvr.capi OvrMatrix4f OvrQuaternionf OvrVector3f Posef]))
 

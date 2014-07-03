@@ -1,4 +1,4 @@
-(ns clojocular.utils
+(ns cljovr.utils
   (:import [org.saintandreas.math Matrix4f Quaternion Vector3f]
            [com.oculusvr.capi OvrMatrix4f OvrQuaternionf OvrVector3f Posef]))
 
