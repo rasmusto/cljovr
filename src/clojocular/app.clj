@@ -1,20 +1,15 @@
 (ns clojocular.app
   (:require [clojocular.utils :as utils])
-  (:import [org.lwjgl.opengl GL11]
-           org.lwjgl.opengl.GLContext
-           [java.awt Rectangle]
+  (:import [java.awt Rectangle]
            [org.lwjgl.opengl ContextAttribs PixelFormat]
-           [org.saintandreas.gl FrameBuffer MatrixStack OpenGL]
+           [org.saintandreas.gl FrameBuffer MatrixStack]
            [org.saintandreas.gl.app LwjglApp]
-           [org.saintandreas.gl.buffers VertexArray]
            [org.saintandreas.math Matrix4f]
 
            [com.oculusvr.capi EyeRenderDesc FovPort HmdDesc OvrLibrary
             OvrVector2i Posef RenderAPIConfig Texture TextureHeader]
            com.oculusvr.capi.OvrLibrary$ovrRenderAPIType
-           com.oculusvr.capi.FovPort$ByValue
-           com.oculusvr.capi.OvrLibrary$ovrHmd
-           com.oculusvr.capi.OvrLibrary$ovrHmdType
+           com.oculusvr.capi.Hmd
            ))
 
 (comment
@@ -24,16 +19,17 @@
 (def ipd (. OvrLibrary OVR_DEFAULT_IPD))
 
 (def get-hmd
-  (memoize (fn [] (OvrLibrary$ovrHmd/createDebug OvrLibrary$ovrHmdType/ovrHmd_DK1))))
+  (memoize (fn []
+             (. OvrLibrary/INSTANCE ovr_Initialize)
+             (. Hmd createDebug com.oculusvr.capi.OvrLibrary$ovrHmdType/ovrHmd_DK1))))
 
 (comment
- (. OvrLibrary/INSTANCE ovr_Initialize)
- (get-hmd)
- (.getDesc (get-hmd)))
+(. OvrLibrary/INSTANCE ovr_Initialize)
+(get-hmd)
 
-; (OvrLibrary$ovrHmd.)
-; (. (OvrLibrary$ovrHmd.) destroy)
-; (. (get-hmd) destroy)
+ (.getDesc (get-hmd))
+
+ (. (get-hmd) destroy))
 
 (comment
  (.getFloat (get-hmd) OvrLibrary/OVR_KEY_IPD ipd))
@@ -48,7 +44,6 @@
 ; (GL11/glViewport 0 0 10 10)
 
 (defn target-rect [hmd-desc]
-  (System/setProperty "org.lwjgl.opengl.Window.undecorated" "true")
   (let [pixel-format (.withDepthBits (.withSamples (PixelFormat.) 4) 16)
         context-attributes (-> (ContextAttribs. 4 4)
                                (.withForwardCompatible true)
@@ -60,10 +55,11 @@
                                 (.h (.Resolution hmd-desc)))]
     target-rect))
 
-; (target-rect hmd-desc)
+(comment
+ (target-rect hmd-desc)
 
-; (. (OvrLibrary/INSTANCE) ovrMatrix4f_Projection)
-; (. OvrLibrary INSTANCE ovrMatrix4f_Projection)
+ (. (OvrLibrary/INSTANCE) ovrMatrix4f_Projection)
+ (. OvrLibrary INSTANCE ovrMatrix4f_Projection))
 
 ; TODO Debug
 (comment
@@ -73,9 +69,11 @@
 ; (useContext nil)
 (proxy [LwjglApp] []
   (setupDisplay
-    ([] (proxy-super
-         setupDisplay
-         (target-rect (.getDesc (get-hmd))))))
+    ([]
+     (System/setProperty "org.lwjgl.opengl.Window.undecorated", "true")
+     (proxy-super
+      setupDisplay
+      (target-rect (.getDesc (get-hmd))))))
   (initGl
     ([]
      (let [hmd (get-hmd)
@@ -84,7 +82,7 @@
            (for [eye [0 1]
                  :let [default-eye-fov (get (. hmd-desc DefaultEyeFov) eye)
                        fov-port
-                       (doto (FovPort$ByValue.)
+                       (doto (FovPort.)
                          (-> .DownTan (set! (.DownTan default-eye-fov)))
                          (-> .UpTan (set! (.UpTan default-eye-fov)))
                          (-> .LeftTan (set! (.LeftTan default-eye-fov)))
@@ -106,5 +104,6 @@
              ; frame-buffer
              eye-texture-id
              ; [projection fov-port]
-                )]
-          fov-ports))))
+             )]
+       fov-ports))))
+(.setupDisplay app)
