@@ -24,11 +24,8 @@
              (. Hmd createDebug com.oculusvr.capi.OvrLibrary$ovrHmdType/ovrHmd_DK1))))
 
 (comment
-(. OvrLibrary/INSTANCE ovr_Initialize)
-(get-hmd)
-
+ (get-hmd)
  (.getDesc (get-hmd))
-
  (. (get-hmd) destroy))
 
 (comment
@@ -66,7 +63,7 @@
  (System/setProperty "org.lwjgl.util.Debug" "true"))
 ; TODO Debug
 
-; (useContext nil)
+(.setupDisplay
 (proxy [LwjglApp] []
   (setupDisplay
     ([]
@@ -105,5 +102,4 @@
              eye-texture-id
              ; [projection fov-port]
              )]
-       fov-ports))))
-(.setupDisplay app)
+       fov-ports)))))
